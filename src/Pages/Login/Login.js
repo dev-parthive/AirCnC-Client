@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { toast } from 'react-hot-toast';
 import { FaGithub, FaTwitter } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
 import PrimaryButton from '../../Buttons/PrimaryButton';
+import { AuthContext } from '../../Contexts/AuthProvider';
 
 const Login = () => {
+    const {signIn} = useContext(AuthContext)
+    //signIn / Login 
+    const handleSignIn  = event =>{
+        event.preventDefault()
+        const email = event.target.email.value
+        const password = event.target.password.value;
+        console.log(email ,password)
+
+        //login
+        signIn(email, password)
+        .then(result =>{
+            const user = result.user
+            console.log(user)
+            toast.success("User LogedIn")
+
+        })
+        .catch(err => {
+            toast.error(err.message)
+        })
+
+
+    }
+    
     return (
        <div className='flex justify-center items-center pt-8 '>
         <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -14,6 +39,7 @@ const Login = () => {
 
         </div>
         <form action=""
+        onSubmit={handleSignIn}
         noValidate=''
         className='space-y-6 ng-untouched ng-pritine ng-valid'
         >

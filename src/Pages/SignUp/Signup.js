@@ -40,6 +40,15 @@ const Signup = () => {
             .then( ()=> {
                 toast.success("User Created")
                 console.log(user)
+                emailVerify()
+                .then( () => {
+                    toast.success("Check your email spam to verify the email") 
+                })
+                .catch(err => {
+                    toast.err(err.message)
+                })
+                
+
             })
             .catch(err => {
                 toast.error("Error in update profile",err)
