@@ -8,7 +8,8 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signOut
+  signOut,
+  updateProfile
 } from 'firebase/auth'
 import app from '../Firebase/Firebase.config'
 
@@ -18,9 +19,11 @@ const auth = getAuth(app)
 const googleProvider = new GoogleAuthProvider()
 const AuthProvider = ({ children }) => {
   // set state to keep user 
-  const { loading, setLoading } = useState(true)
+  const [ loading, setLoading ] = useState(true)
   // set loading 
-  const { user, setUser } = useState(null)
+  const [user, setUser ]= useState(null)
+  console.log(user)
+
 
   // 1. create user 
   const createUser = (email, password) => {
@@ -29,11 +32,11 @@ const AuthProvider = ({ children }) => {
   }
 
   // 2. Update Name 
-  const updateProfile = (name, photo) => {
+  const updateUserProfile = (name, photo) => {
     setLoading(true)
     return updateProfile(auth.currentUser, {
       displayName: name,
-      photoURL: photo
+      photoURL: photo,
     })
   }
   // 3. email verify 
@@ -84,7 +87,7 @@ const AuthProvider = ({ children }) => {
     user,
     loading,
     createUser,
-    updateProfile,
+    updateUserProfile,
     emailVerify,
     googleSignIn,
     logOut,

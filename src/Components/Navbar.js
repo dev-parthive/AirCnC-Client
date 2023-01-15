@@ -1,12 +1,23 @@
 import React, { useContext, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import { AuthContext } from '../Contexts/AuthProvider';
 
 const Navbar = () => {
-    const { user } = useContext(AuthContext)
+    const { user, logOut } = useContext(AuthContext)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-
+ //handle LogOut 
+ const handleLogOut = () => {
+    logOut()
+    .then(result => {
+        console.log(result)
+        toast.success("User LoggedOut successfully")
+    })
+    .catch(err => {
+        toast.error(err)
+    })
+ }
     return (
         <header className='text-gray-900 body-font shadow-sm'>
             <div className='mx-auto flex flex-wrap py-5 px-20 flex-col md:flex-row items-center'>
@@ -20,7 +31,7 @@ const Navbar = () => {
                             <>
                                 <div className='relative inline-block'>
 
-                                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="relative z-10 block p-2 text-gray-700 bg-white border border-transparent rounded-md  focus:border-blue-500 focus:ring-opacity-40 focus:ring-blue-300 focus:ring focus:outline-none">
+                                    <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="relative z-10 block p-2 text-gray-700 bg-green-50 border border-transparent rounded-md  focus:border-blue-500 focus:ring-opacity-40 focus:ring-blue-300 focus:ring focus:outline-none">
                                         <svg
                                             xmlns='http://www.w3.org/2000/svg'
                                             className='w-5 h-5'
@@ -57,7 +68,7 @@ const Navbar = () => {
                                             </Link>
 
                                             <hr className='border-gray-200' />
-                                            <div className='flex items-center cursor-pointer p-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform hover:bg-gray-100'>
+                                            <div onClick={handleLogOut} className='flex items-center cursor-pointer p-3 text-sm text-gray-600 capitalize transition-colors duration-200 transform hover:bg-gray-100'>
                                                 <svg
                                                     className='w-5 h-5 mx-1'
                                                     viewBox='0 0 24 24'

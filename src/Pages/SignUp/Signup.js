@@ -1,11 +1,63 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PrimaryButton from '../../Buttons/PrimaryButton';
 import {FcGoogle} from 'react-icons/fc'
 import {FaGithub, FaTwitter} from 'react-icons/fa'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider';
+import { toast } from 'react-hot-toast';
 const Signup = () => {
-    const {createUser, updateProfile} = useContext(AuthContext)
+    const {createUser, updateUserProfile, emailVerify, loading, user} = useContext(AuthContext);
+    const handleSubmit = event =>{
+        event.preventDefault()
+        const name = event.target.name.value;
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+        const image = event.target.image.files[0]
+        // console.log(name , email, password, image)
+
+        const formData  = new FormData()
+        formData.append('image', image)
+        // console.log(formData)
+        // be2d42a96c3161b1ca7d51366e24012b
+        const url = `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_ImgBB_apikey}`
+        // console.log(url)
+        fetch(url, {
+            method: "POST", 
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Image URL ",data.data.display_url)
+            // at first we upload the image after that we create the user 
+
+              // create user 
+        createUser(email, password)
+        .then((result) => {
+            const user = result.user
+            console.log(user)
+            // toast.success("User Created")
+            updateUserProfile(name, data.data.display_url)
+            .then( ()=> {
+                toast.success("User Created")
+                console.log(user)
+            })
+            .catch(err => {
+                toast.error("Error in update profile",err)
+            })
+        })
+        .catch((err) => {
+            const message = (err.message)
+            toast.error(`Error in user creation ${message}`)
+        })
+
+        })
+        // if we get some error while image is uploading 
+        .catch(err => {
+            console.log("erro img upload",err)
+        })
+
+      
+    }
     return (
         <div className='flex justify-center items-center '>
             <div className="form-container bg-gray-100 flex flex-col max-w-md p-6 rounded-md">
@@ -13,7 +65,9 @@ const Signup = () => {
                         <h1 className='my-3 text-4xl font-bold'>Signup</h1>
                         <p className='text-sm text-gray-400'>Create a new account</p>
                 </div>
-                <form noValidate="" action="" className='space-y-12 ng-untouched ng-pristine ng-valid'>
+                <form noValidate="" action="" 
+                onSubmit={handleSubmit}
+                className='space-y-12 ng-untouched ng-pristine ng-valid'>
                         <div className='space-y-4'>
                             {/* name input here  */}
 
