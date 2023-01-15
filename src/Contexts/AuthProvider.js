@@ -1,16 +1,102 @@
-import React, {  createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut
+} from 'firebase/auth'
+import app from '../Firebase/Firebase.config'
 
 export const AuthContext = createContext();
-const AuthProvider = ({children}) => {
-    const {loading, setLoading} = useState(true)
-    const {user, setUser} = useState(null)
+const auth = getAuth(app)
 
-    const authInfo ={user, loading};
-    return (
-       <AuthContext.Provider value={authInfo}>
-     {children}
-       </AuthContext.Provider>
-    );
+const googleProvider = new GoogleAuthProvider()
+const AuthProvider = ({ children }) => {
+  // set state to keep user 
+  const { loading, setLoading } = useState(true)
+  // set loading 
+  const { user, setUser } = useState(null)
+
+  // 1. create user 
+  const createUser = (email, password) => {
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, email, password)
+  }
+
+  // 2. Update Name 
+  const updateProfile = (name, photo) => {
+    setLoading(true)
+    return updateProfile(auth.currentUser, {
+      displayName: name,
+      photoURL: photo
+    })
+  }
+  // 3. email verify 
+  const emailVerify = () => {
+    setLoading(true)
+    return sendEmailVerification(auth.currentUser);
+  }
+
+  // 4. signInWithGoogle 
+  const googleSignIn = () => {
+    setLoading(true)
+    return signInWithPopup(auth, googleProvider)
+  }
+
+  // 5.Logout 
+  const logOut = () => {
+    setLoading(true)
+    return signOut(auth)
+  }
+  // 6. Login with password 
+  const signIn = (email, password) => {
+    setLoading(true)
+    return signInWithEmailAndPassword(auth, email, password)
+  }
+
+  // 7.Forget Password 
+  const resetPassword = (email) => {
+    setLoading(true)
+    return sendPasswordResetEmail(auth, email)
+  }
+
+  // 8. Observer for user notice user loggedIn or not 
+  useEffect(() => {
+    // this part will execute once the component is mounted.
+    const unsubscribe = onAuthStateChanged(auth,
+      currentUser => {
+        setUser(currentUser)
+        setLoading(false)
+      })
+    return () => {
+      // this part will execute once the component is unmounted 
+      unsubscribe()
+    }
+  }, [])
+
+
+  const authInfo = {
+    user,
+    loading,
+    createUser,
+    updateProfile,
+    emailVerify,
+    googleSignIn,
+    logOut,
+    signIn,
+    resetPassword,
+    setLoading
+  };
+  return (
+    <AuthContext.Provider value={authInfo}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthProvider;
