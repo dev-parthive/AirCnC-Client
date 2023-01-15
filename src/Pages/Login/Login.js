@@ -7,7 +7,7 @@ import PrimaryButton from '../../Buttons/PrimaryButton';
 import { AuthContext } from '../../Contexts/AuthProvider';
 
 const Login = () => {
-    const {signIn} = useContext(AuthContext)
+    const {signIn, githubSign} = useContext(AuthContext)
     //signIn / Login 
     const handleSignIn  = event =>{
         event.preventDefault()
@@ -29,6 +29,18 @@ const Login = () => {
 
 
     }
+
+    // signInWithGithub
+   const handleGithubSign = () => {
+    githubSign()
+    .then(result => {
+        console.log(result.user)
+        toast.success("user created")
+    })
+    .catch(err => {
+        toast.error(err.message)
+    })
+   }
     
     return (
        <div className='flex justify-center items-center pt-8 '>
@@ -96,7 +108,7 @@ const Login = () => {
                           <FaTwitter></FaTwitter>
           </button>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
-                      <FaGithub></FaGithub>
+                      <FaGithub onClick={handleGithubSign}></FaGithub>
           </button>
                 </div>
                 <p className='px-6 text-sm text-center text-gray-400'>

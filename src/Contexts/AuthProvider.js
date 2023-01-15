@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  GithubAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
   sendEmailVerification,
@@ -16,7 +17,8 @@ import app from '../Firebase/Firebase.config'
 export const AuthContext = createContext();
 const auth = getAuth(app)
 
-const googleProvider = new GoogleAuthProvider()
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider()
 const AuthProvider = ({ children }) => {
   // set state to keep user 
   const [ loading, setLoading ] = useState(true)
@@ -50,7 +52,11 @@ const AuthProvider = ({ children }) => {
     setLoading(true)
     return signInWithPopup(auth, googleProvider)
   }
-
+   // signInWithGithub
+   const githubSign = () => {
+    setLoading(true)
+    return signInWithPopup(auth, githubProvider)
+   }
   // 5.Logout 
   const logOut = () => {
     setLoading(true)
@@ -93,7 +99,8 @@ const AuthProvider = ({ children }) => {
     logOut,
     signIn,
     resetPassword,
-    setLoading
+    setLoading, 
+    githubSign
   };
   return (
     <AuthContext.Provider value={authInfo}>
