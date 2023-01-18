@@ -2,11 +2,16 @@ import React, { useContext, useState } from 'react';
 import PrimaryButton from '../../Buttons/PrimaryButton';
 import {FcGoogle} from 'react-icons/fc'
 import {FaGithub, FaTwitter} from 'react-icons/fa'
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider';
 import { toast } from 'react-hot-toast';
+import SmallSpinner from '../../Components/Spinner/SmallSpinner';
 const Signup = () => {
-    const {createUser, updateUserProfile, emailVerify, loading, user} = useContext(AuthContext);
+    const {createUser, updateUserProfile, emailVerify, loading, user, githubSignIn, googleSignIn, setLoading} = useContext(AuthContext);
+    const navigate = useNavigate()
+    const location = useLocation()
+    const from = location.state?.from?.pathname || "/"
+    //handleSubmit
     const handleSubmit = event =>{
         event.preventDefault()
         const name = event.target.name.value;
@@ -42,20 +47,25 @@ const Signup = () => {
                 console.log(user)
                 emailVerify()
                 .then( () => {
+                    setLoading(false)
+                    navigate(from , {from : true})
                     toast.success("Check your email spam to verify the email") 
                 })
                 .catch(err => {
+                    setLoading(false)
                     toast.err(err.message)
                 })
                 
 
             })
             .catch(err => {
+                setLoading(false)
                 toast.error("Error in update profile",err)
             })
         })
         .catch((err) => {
             const message = (err.message)
+            setLoading(false)
             toast.error(`Error in user creation ${message}`)
         })
 
@@ -67,6 +77,31 @@ const Signup = () => {
 
       
     }
+    // GithubSignIn
+    const handleGithubSignIn = ()=>{
+        githubSignIn()
+        .then( result => {
+            toast.success("User created By Github")
+            console.log(result.user)
+
+        })
+        .catch( err => {
+            toast.error(err.message)
+        })
+    }
+    //GoogleSignIn
+    const handleGoogleSignIn = () =>{
+        googleSignIn()
+        .then( result => {
+            toast.success("User created By Gmail")
+            console.log(result.user)
+
+        })
+        .catch(err => {
+            toast.error(err.message)
+        })
+    }
+
     return (
         <div className='flex justify-center items-center '>
             <div className="form-container bg-gray-100 flex flex-col max-w-md p-6 rounded-md">
@@ -119,7 +154,10 @@ const Signup = () => {
                                 <PrimaryButton type="submit"
                                 classes="w-full px-8 py-3 font-semibold rounded-md bg-gray-900 hover:bg-gray-700 hover:text-white text-gray-100"
                                 >
-                                            Sign up
+                                           {
+                                            loading ?<SmallSpinner></SmallSpinner> : 
+                                            <span>Sign Up</span>
+                                           }
                                 </PrimaryButton>
                             </div>
                         </div>
@@ -135,13 +173,13 @@ const Signup = () => {
                 {/* social icons are here  */}
                 <div className='flex justify-center space-x-4'>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
-                            <FcGoogle></FcGoogle>
+                            <FcGoogle onClick={handleGoogleSignIn}></FcGoogle>
           </button>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
                           <FaTwitter></FaTwitter>
           </button>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
-                      <FaGithub></FaGithub>
+                      <FaGithub onClick={handleGithubSignIn}></FaGithub>
           </button>
                 </div>
                 <p className='px-6 text-sm text-center text-gray-600' > Already have an account yet? {' '}

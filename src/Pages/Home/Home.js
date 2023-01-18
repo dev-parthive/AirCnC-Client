@@ -3,7 +3,7 @@ import Spinner from '../../Components/Spinner/Spinner';
 
 const Home = () => {
     return (
-        <div>
+        <div className=''>
             <Spinner></Spinner>
             
         </div>

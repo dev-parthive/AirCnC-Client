@@ -53,7 +53,7 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, googleProvider)
   }
    // signInWithGithub
-   const githubSign = () => {
+   const githubSignIn = () => {
     setLoading(true)
     return signInWithPopup(auth, githubProvider)
    }
@@ -100,7 +100,7 @@ const AuthProvider = ({ children }) => {
     signIn,
     resetPassword,
     setLoading, 
-    githubSign
+    githubSignIn
   };
   return (
     <AuthContext.Provider value={authInfo}>

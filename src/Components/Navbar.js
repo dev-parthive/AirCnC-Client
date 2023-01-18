@@ -1,18 +1,22 @@
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import { AuthContext } from '../Contexts/AuthProvider';
 
 const Navbar = () => {
     const { user, logOut } = useContext(AuthContext)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const from = location.state?.from?.pathname || "/login";
  //handle LogOut 
  const handleLogOut = () => {
     logOut()
     .then(result => {
         console.log(result)
         toast.success("User LoggedOut successfully")
+        navigate(from , {replace: true})
     })
     .catch(err => {
         toast.error(err)

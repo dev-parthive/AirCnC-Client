@@ -1,13 +1,21 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { FaGithub, FaTwitter } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PrimaryButton from '../../Buttons/PrimaryButton';
+import SmallSpinner from '../../Components/Spinner/SmallSpinner';
 import { AuthContext } from '../../Contexts/AuthProvider';
 
 const Login = () => {
-    const {signIn, githubSign} = useContext(AuthContext)
+    // for store useEmail for ResetPassword
+    const [userEmail , setUserEmail]  = useState('')
+    console.log("from UserEmail state ", userEmail)
+    const {signIn, githubSignIn, googleSignIn, setLoading, loading, resetPassword} = useContext(AuthContext)
+    const navigate =  useNavigate()
+    const location = useLocation()
+
+    let from = location.state?.from?.pathname || "/";
     //signIn / Login 
     const handleSignIn  = event =>{
         event.preventDefault()
@@ -20,10 +28,13 @@ const Login = () => {
         .then(result =>{
             const user = result.user
             console.log(user)
+            setLoading(false)
             toast.success("User LogedIn")
+            navigate( from, {state: true})
 
         })
         .catch(err => {
+            setLoading(false)
             toast.error(err.message)
         })
 
@@ -32,22 +43,55 @@ const Login = () => {
 
     // signInWithGithub
    const handleGithubSign = () => {
-    githubSign()
+    githubSignIn()
     .then(result => {
+        setLoading(false)
         console.log(result.user)
-        toast.success("user created")
+        toast.success("user LogedIn By Github")
+        navigate(from, {state: true})
     })
     .catch(err => {
+        setLoading(false)
         toast.error(err.message)
     })
    }
+
+//    GooogleSignIn 
+const handleGoogleSignIn = () =>{
+    googleSignIn()
+    .then( result => {
+        toast.success("User LogedIn by Gmail")
+        setLoading(false)
+        console.log(result.user)
+        navigate(from, {state: true})
+
+    })
+    .catch(err => {
+        setLoading(false)
+        toast.error(err.message)
+
+    })
+}
+
+//Handle Reset Password 
+const handleResetPassword = () =>{
+    resetPassword(userEmail)
+    .then(()=>{
+        setLoading(false)
+        toast.success("check your email for reset link")
+    })
+    .catch((err) =>{
+        setLoading(false)
+        toast.error(err.message)
+    })
+}
     
     return (
        <div className='flex justify-center items-center pt-8 '>
         <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
         <div className='mb-8 text-center'>
-            <h1 className='my-3 text-4xl font-bold'>Sign in</h1>
-            <p className='text-sm text-gray-400s'>Sign in to access your account</p>
+            <h1 className='my-3 text-4xl font-bold'>Log in</h1>
+            <p className='text-sm text-gray-400s'>Login in to access your account</p>
 
         </div>
         <form action=""
@@ -59,6 +103,8 @@ const Login = () => {
                 <div>
                     <label htmlFor='email'>Email address</label>
                     <input type="email" 
+                    // to get the email address 
+                    onBlur={(event)=> setUserEmail(event.target.value)}
                     name='email'
                     id='email'
                     required
@@ -83,12 +129,16 @@ const Login = () => {
                 <PrimaryButton 
                 type='submit'
                 classes="w-full px-8 py-3 font-semibold rounded-md bg-gray-900 hover:bg-gray-700 hover:text-white text-gray-100">
-                    Sign in
+                    {
+                        loading ? <SmallSpinner></SmallSpinner> 
+                        : 
+                        <span>Log In</span> 
+                    }
                 </PrimaryButton>
             </div>
         </form>
         <div className='space-y-1'>
-            <button className='text-xs hover:underline text-gray-400'>
+            <button onClick={handleResetPassword} className='text-xs hover:underline text-gray-400'>
                 Forgot password?
             </button>
 
@@ -102,7 +152,7 @@ const Login = () => {
         </div>
         <div className='flex justify-center space-x-4'>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
-                            <FcGoogle></FcGoogle>
+                            <FcGoogle onClick={handleGoogleSignIn}></FcGoogle>
           </button>
                 <button aria-label='Log in with Google' className='m-3 rounded-sm text-2xl' >
                           <FaTwitter></FaTwitter>
